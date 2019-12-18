@@ -8,9 +8,9 @@ import sys
 import re
 
 
-PROJECT_ID= "lucid-destiny-262216"
+PROJECT= "lucid-destiny-262216"
 TOPIC = "projects/lucid-destiny-262216/topics/car-traffic"
-schema = 'remote_addr:STRING, timelocal:STRING, request_type:STRING, status:STRING, body_bytes_sent:STRING, http_referer:STRING, http_user_agent:STRING'
+schema = 'region:STRING, region_id:INTEGER, location_description:STRING, current_speed:FLOAT, timestamp:DATETIME, west:STRING, east:STRING, south:STRING, north:STRING'
 #TOPIC = "projects/user-logs-237110/topics/userlogs"
 
 
@@ -40,18 +40,20 @@ class Split(beam.DoFn):
 	def process(self, element):
 		from datetime import datetime
 		element = element.split(",")
+		print(element)
 		d = datetime.strptime(element[1], "%d/%b/%Y:%H:%M:%S")
 		date_string = d.strftime("%Y-%m-%d %H:%M:%S")
 		
 		return [{ 
-			'remote_addr': element[0],
-			'timelocal': date_string,
-			'request_type': element[2],
-			'body_bytes_sent': element[3],
-			'status': element[4],
-			'http_referer': element[5],
-			'http_user_agent': element[6]
-	
+			'region': element[0],
+			'region_id': int(element[1]),
+			'west': element[2],
+			'east': element[3],
+			'north': element[4],
+			'south': element[5],
+			'location_description': element[6],
+			'current_speed': float(element[7]),
+			'timestamp': date_string
 		}]
 
 def main(argv=None):
@@ -69,9 +71,9 @@ def main(argv=None):
 		| "Decode" >> beam.Map(lambda x: x.decode('utf-8'))
 		| "Print Data" >> beam.Map(print)
 	  #| "Clean Data" >> beam.Map(regex_clean)
-	  #| 'ParseCSV' >> beam.ParDo(Split())
-	  #| 'WriteToBigQuery' >> beam.io.WriteToBigQuery('{0}:userlogs.logdata'.format(PROJECT), schema=schema,
-	   # write_disposition=beam.io.BigQueryDisposition.WRITE_APPEND)
+	    | 'ParseCSV' >> beam.ParDo(Split())
+	    | 'WriteToBigQuery' >> beam.io.WriteToBigQuery('{0}:car_traffic_dataset.car_traffic_better'.format(PROJECT), schema=schema,
+	    	write_disposition=beam.io.BigQueryDisposition.WRITE_APPEND)
 	)
 	result = p.run()
 	result.wait_until_finish()
