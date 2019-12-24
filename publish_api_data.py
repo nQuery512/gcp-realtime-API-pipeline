@@ -4,8 +4,10 @@ from google.cloud import pubsub_v1
 import random
 import time
 import os
+import base64
+import json
 
-PROJECT_ID= "lucid-destiny-262216"
+PROJECT_ID = os.environ['PROJECT']
 TOPIC = "car-traffic"
 EXTERNAL_API_URL = os.environ['EXTERNAL_API_URL']
 EXTERNAL_API_KEY = os.environ['EXTERNAL_API_KEY']
@@ -15,8 +17,13 @@ EXTERNAL_API_KEY = os.environ['EXTERNAL_API_KEY']
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(PROJECT_ID, TOPIC)
 
-def publish(publisher, topic, message):
-    data = message.encode('utf-8')
+def publish(publisher, topic, data_lines):
+    messages = []
+    for line in data_lines:
+        messages.append({'data': line})
+    body = {'messages': messages}
+    str_body = json.dumps(body)
+    data = base64.urlsafe_b64encode(bytearray(str_body, 'utf8'))
     return publisher.publish(topic_path, data = data)
 
 def callback(message_future):
