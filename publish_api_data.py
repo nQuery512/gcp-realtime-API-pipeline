@@ -8,7 +8,7 @@ import base64
 import json
 
 PROJECT_ID = os.environ['PROJECT']
-TOPIC = "car-traffic"
+TOPIC = os.environ['TOPIC_NAME']
 EXTERNAL_API_URL = os.environ['EXTERNAL_API_URL']
 EXTERNAL_API_KEY = os.environ['EXTERNAL_API_KEY']
 
@@ -18,13 +18,16 @@ publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(PROJECT_ID, TOPIC)
 
 def publish(publisher, topic_path, data_lines):
-    messages = []
-    for line in data_lines:
-        messages.append({'data': line})
-    body = {'messages': messages}
-    str_body = json.dumps(body)
-    data = base64.urlsafe_b64encode(bytearray(str_body, 'utf8'))
-    return publisher.publish(topic_path, data = data)
+	messages = []
+	print(type(json.loads(data_lines)))
+	for line in json.loads(data_lines):
+		print(line)
+		messages.append({'data': line})
+	body = {'messages': messages}
+	str_body = json.dumps(body)
+	#print(str_body)
+	#data = base64.urlsafe_b64encode(bytearray(str_body, 'utf8'))
+	return publisher.publish(topic_path, data = str_body.encode('utf-8'))
 
 def callback(message_future):
     # When timeout is unspecified, the exception method waits indefinitely.
@@ -39,7 +42,7 @@ if __name__ == '__main__':
     while True:
         data = request_api.retrieve_data_from_api(EXTERNAL_API_URL, EXTERNAL_API_KEY)
         #print(type(data))
-        print(data)
+        #print(data)
         message_future = publish(publisher, topic_path, data)
         message_future.add_done_callback(callback)
 

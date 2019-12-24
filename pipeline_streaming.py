@@ -1,83 +1,86 @@
 from apache_beam.options.pipeline_options import PipelineOptions
-from google.cloud import pubsub_v1
+from google.cloud import pubsub
 from google.cloud import bigquery
 import apache_beam as beam
 import logging
 import argparse
 import sys
 import re
+import os
+import base64
+import json
 
-
-PROJECT= "lucid-destiny-262216"
-TOPIC = "projects/lucid-destiny-262216/topics/car-traffic"
+PROJECT_NAME = os.environ["PROJECT"]
+TOPIC_NAME = os.environ['TOPIC_NAME']
 schema = 'region:STRING, region_id:INTEGER, location_description:STRING, current_speed:FLOAT, timestamp:DATETIME, west:STRING, east:STRING, south:STRING, north:STRING'
-#TOPIC = "projects/user-logs-237110/topics/userlogs"
+SUBSCRIBE_NAME = os.environ["SUBSCRIBE_NAME"]
+DATABASE_NAME = os.environ["DATABASE_NAME"]
+TABLE_NAME = os.environ["TABLE_NAME"]
+
+def write_to_bigquery(dataset_id, table_id, messages):
+	client = bigquery.Client()
+	dataset_ref = client.dataset(dataset_id)
+	table_ref = dataset_ref.table(table_id)
+	table = client.get_table(table_ref)
+	#print("writing "+str(messages))
+	errors = client.insert_rows(table, messages)
+	if not errors:
+		print('Loaded {} row(s) into {}:{}'.format(len(messages), dataset_id, table_id))
+	else:
+		print('Errors:')
+		for error in errors:
+			print(error)
+
+def collect_data(data):
+	results = []
+	#print(data)
+	#exit()
+	#stream = base64.urlsafe_b64decode(data)
+	#print(stream)
+	#exit()
+	#print(type(data.decode('utf-8')))
+	#print(data.decode('utf-8'))
+	#stream = data.decode('utf-8')
+	#print(stream)
+	#print("STREAM :"+str(stream))
+	#print("STREAM TYPE :"+str(type(stream)))
+	msgraw = json.loads(data.decode('utf-8'))
+	messages = msgraw.get('messages')
+	#print("Collecting "+str(messages))
+	for message in messages:
+		results.append(message['data'])
+	print(results)
+	write_to_bigquery(DATABASE_NAME, TABLE_NAME, results)
+	exit()
+
+def receive_message(project, subscription_name):
+    subscriber = pubsub.SubscriberClient()
+    subscription_path = subscriber.subscription_path(
+        project, subscription_name)
+
+    def callback(message):
+        #print('Received message: {}'.format(message))
+        collect_data(message.data)
+        message.ack()
+
+    future = subscriber.subscribe(subscription_path, callback=callback)
+    print('Listening for messages on {}'.format(subscription_path))
+
+    #future = subscription.open(callback)
+    try:
+        future.result()
+    except Exception as e:
+        print(
+            'Listening for messages on {} threw an Exception: {}'.format(
+                subscription_name, e))
+        raise
+
+    while True:
+        time.sleep(10)
 
 
-def regex_clean(data):
-
-	PATTERNS =  [r'(^\S+\.[\S+\.]+\S+)\s',r'(?<=\[).+?(?=\])',
-		   r'\"(\S+)\s(\S+)\s*(\S*)\"',r'\s(\d+)\s',r"(?<=\[).\d+(?=\])",
-		   r'\"[A-Z][a-z]+', r'\"(http|https)://[a-z]+.[a-z]+.[a-z]+']
-	result = []
-	for match in PATTERNS:
-		try:
-			reg_match = re.search(match, data).group()
-			if reg_match:
-				result.append(reg_match)
-			else:
-				result.append(" ")
-		except:
-			print("There was an error with the regex search")
-	result = [x.strip() for x in result]
-	result = [x.replace('"', "") for x in result]
-	res = ','.join(result)
-	return res
-
-
-class Split(beam.DoFn):
-
-	def process(self, element):
-		from datetime import datetime
-		element = element.split(",")
-		print(element)
-		d = datetime.strptime(element[1], "%d/%b/%Y:%H:%M:%S")
-		date_string = d.strftime("%Y-%m-%d %H:%M:%S")
-		
-		return [{ 
-			'region': element[0],
-			'region_id': int(element[1]),
-			'west': element[2],
-			'east': element[3],
-			'north': element[4],
-			'south': element[5],
-			'location_description': element[6],
-			'current_speed': float(element[7]),
-			'timestamp': date_string
-		}]
-
-def main(argv=None):
-
-	parser = argparse.ArgumentParser()
-	parser.add_argument("--input_topic")
-	parser.add_argument("--output")
-	known_args = parser.parse_known_args(argv)
-
-
-	p = beam.Pipeline(options=PipelineOptions())
-	print("OK")
-	(p
-		| "ReadData" >> beam.io.ReadFromPubSub(topic=TOPIC).with_output_types(bytes)
-		| "Decode" >> beam.Map(lambda x: x.decode('utf-8'))
-		| "Print Data" >> beam.Map(print)
-	  #| "Clean Data" >> beam.Map(regex_clean)
-	    | 'ParseCSV' >> beam.ParDo(Split())
-	    | 'WriteToBigQuery' >> beam.io.WriteToBigQuery('{0}:car_traffic_dataset.car_traffic_better'.format(PROJECT), schema=schema,
-	    	write_disposition=beam.io.BigQueryDisposition.WRITE_APPEND)
-	)
-	result = p.run()
-	result.wait_until_finish()
 
 if __name__ == '__main__':
-  logger = logging.getLogger().setLevel(logging.INFO)
-  main()
+	logger = logging.getLogger().setLevel(logging.INFO)
+	#main()
+	receive_message(PROJECT_NAME, SUBSCRIBE_NAME)
