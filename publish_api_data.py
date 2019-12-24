@@ -17,7 +17,7 @@ EXTERNAL_API_KEY = os.environ['EXTERNAL_API_KEY']
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(PROJECT_ID, TOPIC)
 
-def publish(publisher, topic, data_lines):
+def publish(publisher, topic_path, data_lines):
     messages = []
     for line in data_lines:
         messages.append({'data': line})
