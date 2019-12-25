@@ -11,5 +11,6 @@
 
 ## Ingestion pipeline description
 Cloud Pub/Sub -> Apache Beam+Cloud DataFlow -> BigQuery
+
 Using 1 Cloud Compute Engine instance, but can run in properly configured local environment
 
