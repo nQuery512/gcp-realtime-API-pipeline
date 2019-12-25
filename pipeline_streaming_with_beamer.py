@@ -15,7 +15,7 @@ TOPIC_NAME = os.environ['TOPIC_NAME']
 DATABASE_NAME = os.environ['DATABASE_NAME']
 TABLE_NAME = os.environ['TABLE_NAME']
 TOPIC = "projects/"+PROJECT+"/topics/"+TOPIC_NAME
-print(TOPIC)
+print("Subscribing to "+TOPIC)
 
 DB_URI = PROJECT+':'+DATABASE_NAME+'.'+TABLE_NAME
 print("\n\n\n"+DB_URI+"\n\n\n")
@@ -23,11 +23,10 @@ class ParseData(beam.DoFn):
 
     def process(self, element):
         res = []
-        #  print(element)
+
         json_data = json.loads(element)
         json_data = json_data['messages']
         for elem in json_data:
-#            print(elem['data'])
             res.append(elem['data'])
         print(type(res))
         print(res)
@@ -47,9 +46,6 @@ def main(argv=None):
       | 'ReadData' >> beam.io.ReadFromPubSub(topic=TOPIC).with_output_types(bytes)
       | "Decode" >> beam.Map(lambda x: x.decode('utf-8'))
       | "ParseJSON" >> beam.ParDo(ParseData())
-#      | "Print Data" >> beam.Map(PrintData)
-     # | "Clean Data" >> beam.Map(json.dumps)
-     # | 'ParseCSV' >> beam.ParDo(Split())
       | 'WriteToBigQuery' >> beam.io.WriteToBigQuery(PROJECT+':'+DATABASE_NAME+'.'+TABLE_NAME, schema=schema,
         write_disposition=beam.io.BigQueryDisposition.WRITE_APPEND)
    )

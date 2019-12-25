@@ -22,7 +22,7 @@ def write_to_bigquery(dataset_id, table_id, messages):
 	dataset_ref = client.dataset(dataset_id)
 	table_ref = dataset_ref.table(table_id)
 	table = client.get_table(table_ref)
-	#print("writing "+str(messages))
+
 	errors = client.insert_rows(table, messages)
 	if not errors:
 		print('Loaded {} row(s) into {}:{}'.format(len(messages), dataset_id, table_id))
@@ -33,25 +33,13 @@ def write_to_bigquery(dataset_id, table_id, messages):
 
 def collect_data(data):
 	results = []
-	#print(data)
-	#exit()
-	#stream = base64.urlsafe_b64decode(data)
-	#print(stream)
-	#exit()
-	#print(type(data.decode('utf-8')))
-	#print(data.decode('utf-8'))
-	#stream = data.decode('utf-8')
-	#print(stream)
-	#print("STREAM :"+str(stream))
-	#print("STREAM TYPE :"+str(type(stream)))
 	msgraw = json.loads(data.decode('utf-8'))
 	messages = msgraw.get('messages')
-	#print("Collecting "+str(messages))
+
 	for message in messages:
 		results.append(message['data'])
 	print(results)
 	write_to_bigquery(DATABASE_NAME, TABLE_NAME, results)
-	exit()
 
 def receive_message(project, subscription_name):
     subscriber = pubsub.SubscriberClient()
@@ -78,9 +66,6 @@ def receive_message(project, subscription_name):
     while True:
         time.sleep(10)
 
-
-
 if __name__ == '__main__':
 	logger = logging.getLogger().setLevel(logging.INFO)
-	#main()
 	receive_message(PROJECT_NAME, SUBSCRIBE_NAME)
