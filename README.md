@@ -16,7 +16,41 @@ Using 1 Cloud Compute Engine instance, but can run in properly configured local 
 
 ## How to run
 
+First you MUST modify set_env_encrypted.sh to match your environment
+
+### Prerequisite
 ```shell
 sudo sh install-deps.sh
-
+source ./set_env_encrypted.sh
+ 
 ```
+
+### Publisher
+```shell
+python3 publish_api_data.py 
+```
+
+### Pipeline without Apache Beam
+
+#### Pipeline Sub -> BigQuery in local mode (without DataFlow)
+```shell 
+python3 pipeline_streaming.py --streaming
+```
+
+** OR **
+
+#### Pipeline Sub -> BigQuery with DataFlow
+```shell
+python3 pipeline_streaming.py --project $PROJECT --temp_location $BUCKET/tmp --staging_location $BUCKET/staging --streaming
+```
+
+### Pipeline using Apache Beam
+#### Pipeline Sub -> BigQuery in local mode (without DataFlow)
+```shell
+python3 pipeline_streaming_beam.py --streaming
+```
+
+#### Pipeline Sub -> BigQuery with DataFlow
+```shell
+python3 pipeline_streaming_beam.py --project $PROJECT --temp_location $BUCKET/tmp --staging_location $BUCKET/staging --streaming
+``` 
