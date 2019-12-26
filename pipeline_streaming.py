@@ -12,7 +12,6 @@ import json
 
 PROJECT_NAME = os.environ["PROJECT"]
 TOPIC_NAME = os.environ['TOPIC_NAME']
-schema = 'region:STRING, region_id:INTEGER, location_description:STRING, current_speed:FLOAT, timestamp:DATETIME, west:STRING, east:STRING, south:STRING, north:STRING'
 SUBSCRIBE_NAME = os.environ["SUBSCRIBE_NAME"]
 DATABASE_NAME = os.environ["DATABASE_NAME"]
 TABLE_NAME = os.environ["TABLE_NAME"]
