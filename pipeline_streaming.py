@@ -1,5 +1,5 @@
 from apache_beam.options.pipeline_options import PipelineOptions
-from google.cloud import pubsub
+from google.cloud import pubsub_v1 as pubsub
 from google.cloud import bigquery
 import apache_beam as beam
 import logging
@@ -32,14 +32,9 @@ def write_to_bigquery(dataset_id, table_id, messages):
 			print(error)
 
 def collect_data(data):
-	results = []
-	msgraw = json.loads(data.decode('utf-8'))
-	messages = msgraw.get('messages')
-
-	for message in messages:
-		results.append(message['data'])
-	print(results)
-	write_to_bigquery(DATABASE_NAME, TABLE_NAME, results)
+	res = json.loads(data.decode('utf-8'))
+	print(res)
+	write_to_bigquery(DATABASE_NAME, TABLE_NAME, res)
 
 def receive_message(project, subscription_name):
     subscriber = pubsub.SubscriberClient()
@@ -47,16 +42,14 @@ def receive_message(project, subscription_name):
         project, subscription_name)
 
     def callback(message):
-        #print('Received message: {}'.format(message))
         collect_data(message.data)
         message.ack()
 
     future = subscriber.subscribe(subscription_path, callback=callback)
     print('Listening for messages on {}'.format(subscription_path))
 
-    #future = subscription.open(callback)
     try:
-        future.result()
+        future.result(timeout=30)
     except Exception as e:
         print(
             'Listening for messages on {} threw an Exception: {}'.format(
@@ -64,7 +57,7 @@ def receive_message(project, subscription_name):
         raise
 
     while True:
-        time.sleep(10)
+        time.sleep(60)
 
 if __name__ == '__main__':
 	logger = logging.getLogger().setLevel(logging.INFO)

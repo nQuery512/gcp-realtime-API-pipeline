@@ -16,14 +16,8 @@ publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(PROJECT_ID, TOPIC)
 
 def publish(publisher, topic_path, data_lines):
-	messages = []
-	print(type(json.loads(data_lines)))
-	for line in json.loads(data_lines):
-		print(line)
-		messages.append({'data': line})
-	body = {'messages': messages}
-	str_body = json.dumps(body)
-	return publisher.publish(topic_path, data = str_body.encode('utf-8'))
+	print(data_lines)
+	return publisher.publish(topic_path, data = data_lines.encode('utf-8'))
 
 def callback(message_future):
     # When timeout is unspecified, the exception method waits indefinitely.

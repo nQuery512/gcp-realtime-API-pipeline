@@ -18,16 +18,15 @@ TOPIC = "projects/"+PROJECT+"/topics/"+TOPIC_NAME
 print("Subscribing to "+TOPIC)
 
 DB_URI = PROJECT+':'+DATABASE_NAME+'.'+TABLE_NAME
-print("\n\n\n"+DB_URI+"\n\n\n")
+print("\n"+DB_URI+"\n")
 class ParseData(beam.DoFn):
 
     def process(self, element):
-        res = []
 
-        json_data = json.loads(element)
-        json_data = json_data['messages']
-        for elem in json_data:
-            res.append(elem['data'])
+        res = json.loads(element)
+        #json_data = json_data['messages']
+        #for elem in json_data:
+        #    res.append(elem['data'])
         print(type(res))
         print(res)
         return res
