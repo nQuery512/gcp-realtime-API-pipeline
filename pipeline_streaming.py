@@ -1,13 +1,9 @@
 from apache_beam.options.pipeline_options import PipelineOptions
 from google.cloud import pubsub_v1 as pubsub
 from google.cloud import bigquery
-import apache_beam as beam
 import logging
-import argparse
 import sys
-import re
 import os
-import base64
 import json
 
 PROJECT_NAME = os.environ["PROJECT"]
@@ -48,7 +44,7 @@ def receive_message(project, subscription_name):
     print('Listening for messages on {}'.format(subscription_path))
 
     try:
-        future.result(timeout=30)
+        future.result()
     except Exception as e:
         print(
             'Listening for messages on {} threw an Exception: {}'.format(
@@ -56,7 +52,7 @@ def receive_message(project, subscription_name):
         raise
 
     while True:
-        time.sleep(60)
+        time.sleep(10)
 
 if __name__ == '__main__':
 	logger = logging.getLogger().setLevel(logging.INFO)

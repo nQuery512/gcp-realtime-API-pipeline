@@ -1,10 +1,8 @@
 import request_api
 import logging
 from google.cloud import pubsub_v1
-import random
 import time
 import os
-import base64
 import json
 
 PROJECT_ID = os.environ['PROJECT']
@@ -35,5 +33,5 @@ if __name__ == '__main__':
         message_future = publish(publisher, topic_path, data)
         message_future.add_done_callback(callback)
 
-        sleep_time = random.choice(range(1, 3, 1))
+        sleep_time = 1200
         time.sleep(sleep_time)
