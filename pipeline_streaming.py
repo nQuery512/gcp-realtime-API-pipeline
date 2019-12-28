@@ -28,6 +28,12 @@ def write_to_bigquery(dataset_id, table_id, messages):
 
 def collect_data(data):
 	res = json.loads(data.decode('utf-8'))
+#	print(res)
+
+	for e in res:
+		e['p1'] = str(e['_north'] + ', ' + e['_west'])
+		e['p2'] = str(e['_south'] + ', ' + e['_east'])
+		del e['_north'], e['_south'], e['_west'], e['_east']
 	print(res)
 	write_to_bigquery(DATABASE_NAME, TABLE_NAME, res)
 

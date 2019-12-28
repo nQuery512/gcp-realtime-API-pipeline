@@ -1,0 +1,27 @@
+[
+  {
+    "mode": "REQUIRED", 
+    "name": "TIME", 
+    "type": "STRING"
+  }, 
+  {
+    "mode": "REQUIRED", 
+    "name": "_REGION_ID", 
+    "type": "INTEGER"
+  }, 
+  {
+    "mode": "REQUIRED", 
+    "name": "BUS_COUNT", 
+    "type": "INTEGER"
+  }, 
+  {
+    "mode": "REQUIRED", 
+    "name": "NR", 
+    "type": "INTEGER"
+  }, 
+  {
+    "mode": "REQUIRED", 
+    "name": "SPEED", 
+    "type": "FLOAT"
+  }
+]

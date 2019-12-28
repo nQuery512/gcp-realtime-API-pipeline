@@ -10,7 +10,7 @@ import os
 import json
 
 PROJECT = os.environ['PROJECT']
-schema = 'region:STRING, region_id:INTEGER, _description:STRING, current_speed:FLOAT, _last_updt:DATETIME, _west:FLOAT, _east:FLOAT, _south:FLOAT, _north:FLOAT'
+schema = 'region:STRING, _region_id:INTEGER, _description:STRING, current_speed:FLOAT, _last_updt:DATETIME, _west:FLOAT, _east:FLOAT, _south:FLOAT, _north:FLOAT'
 TOPIC_NAME = os.environ['TOPIC_NAME']
 DATABASE_NAME = os.environ['DATABASE_NAME']
 TABLE_NAME = os.environ['TABLE_NAME']
