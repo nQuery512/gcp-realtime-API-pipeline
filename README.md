@@ -2,10 +2,10 @@
 - [X] Acquire and ingest real-time events from external API using google Pub/Sub
 - [X] Pipeline using gcloud library
 - [X] Pipeline using Apache Beam
-- [ ] Acquire and ingest static files 
+- [x] Acquire and ingest static files 
 - [x] Store raw data in BigQuery
 - [x] Create new BigQuery table using transformation (handle real-time ?)
-- [ ] Data visualization using google cloud tools and/or WebApp (AppEngine)
+- [ ] Data visualization using google cloud tools (datastudio?) and/or WebApp (AppEngine)
 
 ![Realtime pipeline schema](https://cloud.google.com/dataflow/images/diagram-dataflow.png) (This image is a property of Google)
 
