@@ -1,0 +1,27 @@
+[
+  {
+    "mode": "REQUIRED", 
+    "name": "_region_id", 
+    "type": "INTEGER"
+  }, 
+  {
+    "mode": "REQUIRED", 
+    "name": "region", 
+    "type": "STRING"
+  }, 
+  {
+    "mode": "REQUIRED", 
+    "name": "_description", 
+    "type": "STRING"
+  }, 
+  {
+    "mode": "NULLABLE", 
+    "name": "p1", 
+    "type": "STRING"
+  }, 
+  {
+    "mode": "NULLABLE", 
+    "name": "p2", 
+    "type": "STRING"
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "mode": "REQUIRED", 
+    "name": "current_speed", 
+    "type": "FLOAT"
+  }, 
+  {
+    "mode": "REQUIRED", 
+    "name": "_region_id", 
+    "type": "INTEGER"
+  }, 
+  {
+    "mode": "REQUIRED", 
+    "name": "region", 
+    "type": "STRING"
+  }, 
+  {
+    "mode": "REQUIRED", 
+    "name": "_description", 
+    "type": "STRING"
+  }, 
+  {
+    "mode": "REQUIRED", 
+    "name": "p1", 
+    "type": "STRING"
+  }, 
+  {
+    "mode": "REQUIRED", 
+    "name": "p2", 
+    "type": "STRING"
+  }, 
+  {
+    "mode": "REQUIRED", 
+    "name": "_last_updt", 
+    "type": "STRING"
+  }
+]
