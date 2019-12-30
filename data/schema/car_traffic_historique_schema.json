@@ -23,21 +23,5 @@
     "mode": "REQUIRED", 
     "name": "SPEED", 
     "type": "FLOAT"
-  }, 
-  {
-    "name": "p1", 
-    "type": "STRING"
-  }, 
-  {
-    "name": "p2", 
-    "type": "STRING"
-  }, 
-  {
-    "name": "region", 
-    "type": "STRING"
-  }, 
-  {
-    "name": "_description", 
-    "type": "STRING"
   }
 ]
