@@ -22,9 +22,12 @@ bq load --source_format=NEWLINE_DELIMITED_JSON $PROJECT:$DATABASE_NAME.$TMP_TABL
 
 echo "\nAlimentation de la table historique"
 bq load --source_format=CSV --skip_leading_rows=1 --field_delimiter=';' $PROJECT:$DATABASE_NAME.$HISTO_TABLE_NAME ./data/chicago_car_traffic_2013_2018.csv ./data/schema/car_traffic_historique_schema.json
-exit
+
 echo "\nAlimentation de la table de correspondance"
 bq query < ./bigquery/make_corresp_table.sql
+
+echo "\nMise a jour du schéma de table historique"
+bq update $PROJECT:$DATABASE_NAME.$HISTO_TABLE_NAME ./data/schema/car_traffic_historique_schema_new.json
 
 echo "\nEnrichissement de l'historique"
 bq query < ./bigquery/enrich_historique.sql
